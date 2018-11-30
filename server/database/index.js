@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://qays:Qays123@ds255539.mlab.com:55539/paringsys');
+mongoose.connect('localhost:27017/qa-engine');
 mongoose.Promise = global.Promise;
 const db = mongoose.connection;
 
