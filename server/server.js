@@ -42,7 +42,6 @@ app.post('/login', (req, res) => {
         if(err) throw err;
         bcrypt.compare(password, data.password, (found) => {
             if(found){
-                //console.log('session');
                 helper.createSession(req, res, data.username);
             } else {
                 res.sendStatus(400);
