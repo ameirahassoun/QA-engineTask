@@ -14,13 +14,19 @@ db.once('open', () => {
 
 let Schema = mongoose.Schema; // Create a mongoose schema 
 
+let Question = new Schema({
+    structure:{ type: String},
+    answer: { type: String}
+})
+
 let User = new Schema({
     username: { type: String },
     password: { type: String,required: true },
-    questions:{ type: String},
-    answers: { type: String}
+    questions:[Question]
 })
+
 
 User = mongoose.model('user', User);
 
 module.exports.User = User;
+module.exports.Question = Question;
