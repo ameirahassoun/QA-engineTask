@@ -4,6 +4,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const db = require('./database/index');
 const salt = 10;
+const helper = require('./helper')
 
 app.use(express.static(path.join(__dirname, '../react-client/build')));
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -26,26 +27,67 @@ app.post('/signup' , (req, res) => {
                 user.save(err, data => {
                     if (err) {
                         throw err;
-                    } 
+                    } else {
+                        helper.createSession(req, res, data.username);
+                    }
                 });
             });
         }
     })
 });
 
-app.post('login', (req, res) => {
+app.post('/login', (req, res) => {
     const {username, password} = req.body;
     db.User.find({username}, (err, data) => {
         if(err) throw err;
         bcrypt.compare(password, data.password, (found) => {
             if(found){
-                console.log('session');
+                //console.log('session');
+                helper.createSession(req, res, data.username);
             } else {
                 res.sendStatus(400);
             } 
         })
     })
 });
+
+
+app.post('/logout', (req, res) => {
+    req.session.destroy(function () { 
+        res.sendStatus(200);
+    });
+})
+
+app.post('/question', (req, res) => {
+    const { question } = req.body;
+    db.User.update({username: req.session.username},{$set: {questions: question}},
+         (err, data) => {
+        if (err) {
+            throw err;
+        } else {
+            res.send(data);
+        }
+    })
+})
+
+app.get('/ques', (req, res) => {
+    db.User.find({username: req.session.username}, (err, data) => {
+        if (err) {
+            throw err;
+        }
+        res.send(data);
+    })
+})
+
+app.get('/allQuestion', (req, res) => {
+    db.User.find({} , (err, data) => {
+        if (err) {
+            throw err;
+        }
+        res.send(data);
+    })
+})
+
 
 // all the http methods, and the handlers in the han =>dler file.
 app.get('/*', (req, res) => {

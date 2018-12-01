@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-mongoose.connect('localhost:27017/qa-engine');
+mongoose.connect('mongodb://localhost:27017/qa-engine');
 mongoose.Promise = global.Promise;
 const db = mongoose.connection;
 
