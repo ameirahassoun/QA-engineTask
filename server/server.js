@@ -5,10 +5,17 @@ const bodyParser = require('body-parser');
 const db = require('./database/index');
 const salt = 10;
 const helper = require('./helper')
+const bcrypt = require('bcrypt');
+const session = require('express-session'); 
 
 app.use(express.static(path.join(__dirname, '../react-client/build')));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use(session({
+    secret: 'very very secret', 
+    resave: true, 
+    saveUninitialized: true
+})); 
 
 app.post('/signup' , (req, res) => { 
     const { username, password } = req.body;
@@ -21,13 +28,15 @@ app.post('/signup' , (req, res) => {
                 } 
                 let user = new db.User({
                     username: username,
-                    email: email,
                     password: hash
                 }); 
-                user.save(err, data => {
+                user.save((err, data) => {
                     if (err) {
                         throw err;
+                    } else if (!data) {
+                        res.sendStatus(400);
                     } else {
+                        console.log(data)
                         helper.createSession(req, res, data.username);
                     }
                 });
