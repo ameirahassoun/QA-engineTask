@@ -36,7 +36,6 @@ app.post('/signup' , (req, res) => {
                     } else if (!data) {
                         res.sendStatus(400);
                     } else {
-                        console.log(data)
                         helper.createSession(req, res, data.username);
                     }
                 });
@@ -51,7 +50,7 @@ app.post('/login', (req, res) => {
         if(err) throw err;
         bcrypt.compare(password, data.password, (found) => {
             if(found){
-                helper.createSession(req, res, data.username);
+                helper.createSession(req, res, data[0].username);
             } else {
                 res.sendStatus(400);
             } 
@@ -67,24 +66,25 @@ app.post('/logout', (req, res) => {
 })
 
 app.post('/question', (req, res) => {
-    const { question } = req.body;
-    db.User.update({username: req.session.username},{$set: {questions: question}},
-         (err, data) => {
-        if (err) {
-            throw err;
-        } else {
-            res.send(data);
-        }
+    const { theQuestion } = req.body;
+    db.User.update({username: req.session.username},
+        {$push: {questions: theQuestion}}, (err, data) => {
+        if(err) throw err; 
+        res.send(data);
     })
 })
 
-app.get('/ques', (req, res) => {
-    db.User.find({username: req.session.username}, (err, data) => {
-        if (err) {
-            throw err;
-        }
+app.post('/addAnswer', (req, res) => {
+    const { answer, questions_id } = req.body;
+    db.User.update({'questions._id': questions_id}, 
+    {$set: {'questions.$.answer': answer}}, (err, data) => {
+        if (err) throw err;
         res.send(data);
     })
+})
+
+app.get('/getUserQuestion', (req, res) => {
+    console.log('ques')
 })
 
 app.get('/allQuestion', (req, res) => {

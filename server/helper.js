@@ -1,7 +1,7 @@
 
 exports.createSession = function (req, res, newUser) {
     req.session.regenerate(function () {
-        req.session.user = newUser;
+        req.session.username = newUser;
         res.sendStatus(201)
     });
 };
