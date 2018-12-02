@@ -18,16 +18,23 @@ onChange = e => {
 login = () =>{ 
   const { username, password } =this.state;
   axios.post('/login', {username, password})
-  .then(data => {
-    console.log(data)
+  .then(({config}) => {
+    if (JSON.parse(config.data).username === 'admin'){
+      window.location.href = '/admin'
+    }else {
+      window.location.href = '/main';
+    }
   })
   .catch(err => {
     console.log(err)
   })
 } 
+
   render() {
     return (
       <div className="Login">
+      <button onClick={() => window.location.href='/signup'}>signup</button>
+
         User Name :
         <input
         name='username'
